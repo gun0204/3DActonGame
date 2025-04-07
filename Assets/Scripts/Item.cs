@@ -9,6 +9,6 @@ public class Item : MonoBehaviour
 
     private void Update()
     {
-        transform.Rotate(Vector3.up * 20 * Time.deltaTime);
+        transform.Rotate(Vector3.up * 10 * Time.deltaTime);
     }
 }
