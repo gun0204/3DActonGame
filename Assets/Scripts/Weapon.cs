@@ -7,8 +7,15 @@ public class Weapon : MonoBehaviour
     public Type type;
     public int damage;
     public float rate;
+    public int maxAmmo;
+    public int curAmmo;
+
     public BoxCollider meleeArea;
     public TrailRenderer trailEffect;
+    public Transform bulletPos;
+    public GameObject bullet;
+    public Transform bulletCasePos;
+    public GameObject bulletCase;
 
     public void Use()
     {
@@ -17,24 +24,44 @@ public class Weapon : MonoBehaviour
             StopCoroutine("Swing");
             StartCoroutine("Swing");
         }
+        else if (type == Type.Range && curAmmo > 0)
+        {
+            curAmmo--;
+            StartCoroutine("Shot");
+        }
     }
 
    
     IEnumerator Swing()
     {
         //1
-        yield return new WaitForSeconds(0.1f); //0.1ÃÊ ´ë±â
+        yield return new WaitForSeconds(0.1f); //0.1ï¿½ï¿½ ï¿½ï¿½ï¿½
         meleeArea.enabled = true;
         trailEffect.enabled = true;
         //2
-        yield return new WaitForSeconds(0.2f); //0.2ÃÊ ´ë±â
+        yield return new WaitForSeconds(0.2f); //0.2ï¿½ï¿½ ï¿½ï¿½ï¿½
         meleeArea.enabled = false;
         //3
-        yield return new WaitForSeconds(0.3f); //0.3ÃÊ ´ë±â
+        yield return new WaitForSeconds(0.3f); //0.3ï¿½ï¿½ ï¿½ï¿½ï¿½
         trailEffect.enabled = false;
     }
 
-    // Use() ¸ÞÀÎ·çÆ® -> Swing() ¼­ºê·çÆ¾ -> Use() ¸ÞÀÎ·çÆ®
-    // Use() ¸ÞÀÎ·çÆ® + Swing() ÄÚ·çÆ¾(co-Op)
+    // Use() ï¿½ï¿½ï¿½Î·ï¿½Æ® -> Swing() ï¿½ï¿½ï¿½ï¿½ï¿½Æ¾ -> Use() ï¿½ï¿½ï¿½Î·ï¿½Æ®
+    // Use() ï¿½ï¿½ï¿½Î·ï¿½Æ® + Swing() ï¿½Ú·ï¿½Æ¾(co-Op)
 
+
+    IEnumerator Shot()
+    {
+        //#1.ï¿½Ñ¾ï¿½ ï¿½ß»ï¿½ 
+        GameObject instantBullet = Instantiate(bullet, bulletPos.position, bulletPos.rotation);
+        Rigidbody bulletRigid = instantBullet.GetComponent<Rigidbody>();
+        bulletRigid.linearVelocity = bulletPos.forward * 50;
+
+        yield return null;
+        //#2.Åºï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ 
+        GameObject instantCase = Instantiate(bulletCase, bulletCasePos.position, bulletCasePos.rotation);
+        Rigidbody caseRigid = instantCase.GetComponent<Rigidbody>();
+        Vector3 caseVec = bulletCasePos.forward * Random.Range(-3, -2) + Vector3.up * Random.Range(2, 3);
+        caseRigid.AddForce(caseVec, ForceMode.Impulse);
+    }
 }
